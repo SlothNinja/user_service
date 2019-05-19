@@ -1,0 +1,13 @@
+start backend
+----------------------------
+
+DEV=true DEV_CLIENT_CREDENTIALS=dev_client_credentials.json gin -a 8080 -i -t ../ -d . run main.go
+
+
+start database
+------------------------------
+gcloud beta emulators datastore start --data-dir /Volumes/Janice/datastore/user_service/ --host-port user.slothninja.com:8081
+
+watch frontend
+------------------------------
+npm run watch
