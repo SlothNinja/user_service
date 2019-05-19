@@ -1,0 +1,2 @@
+[paths]
+default = ssh://hg@bitbucket.org/SlothNinja/user_service
