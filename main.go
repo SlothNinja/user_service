@@ -12,8 +12,6 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
 const (
@@ -38,7 +36,7 @@ func main() {
 	setGinMode()
 	r := newRouter(newCookieStore())
 
-	addRoutes(rootPath, r, getOAuth2Config())
+	addRoutes(rootPath, r)
 
 	port := getPort()
 
@@ -51,8 +49,9 @@ func getPort() string {
 	if port != "" {
 		return port
 	}
-	log.Printf("Defaulting to port %s", DefaultPort)
-	return DefaultPort
+	port = DefaultPort
+	log.Printf("Defaulting to port %s", port)
+	return port
 }
 
 // staticHandler for local development since app.yaml is ignored
@@ -97,13 +96,13 @@ func newCookieStore() cookie.Store {
 	return store
 }
 
-func getOAuth2Config() *oauth2.Config {
-	if isDev() {
-		return oauth2Config(envDevClientCreds, "email", "profile", "openid")
-	}
-
-	return oauth2Config(envClientCreds, "email", "profile", "openid")
-}
+// func getOAuth2Config() *oauth2.Config {
+// 	if isDev() {
+// 		return oauth2Config(envDevClientCreds, "email", "profile", "openid")
+// 	}
+//
+// 	return oauth2Config(envClientCreds, "email", "profile", "openid")
+// }
 
 func jsonKey(env string) []byte {
 	path := os.Getenv(env)
@@ -116,12 +115,4 @@ func jsonKey(env string) []byte {
 
 func isDev() bool {
 	return os.Getenv("DEV") == "true"
-}
-
-func oauth2Config(env string, scope ...string) *oauth2.Config {
-	conf, err := google.ConfigFromJSON(jsonKey(env), scope...)
-	if err != nil {
-		panic(err)
-	}
-	return conf
 }

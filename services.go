@@ -17,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"go.chromium.org/gae/service/info"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/appengine"
 
 	"cloud.google.com/go/datastore"
@@ -573,29 +574,22 @@ func uniqueName(c *gin.Context, u1 *user.User2) (bool, error) {
 // 	}
 // }
 
-func Login(conf *oauth2.Config) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		log.Debugf("Entering")
-		defer log.Debugf("Exiting")
+func Login(c *gin.Context) {
+	log.Debugf("Entering")
+	defer log.Debugf("Exiting")
 
-		session := sessions.Default(c)
-		// if sessionLogin(session) {
-		// 	c.Redirect(http.StatusSeeOther, "/")
-		// 	return
-		// }
+	session := sessions.Default(c)
+	state := randToken()
+	session.Set("state", state)
+	session.Save()
 
-		state := randToken()
-		session.Set("state", state)
-		session.Save()
-
-		if v := os.Getenv("DEV_LOGIN"); v == "true" {
-			c.HTML(http.StatusOK, "user/login", gin.H{
-				"Context":   c,
-				"VersionID": info.VersionID(c),
-			})
-		} else {
-			c.Redirect(http.StatusSeeOther, getLoginURL(state, conf))
-		}
+	if v := os.Getenv("DEV_LOGIN"); v == "true" {
+		c.HTML(http.StatusOK, "user/login", gin.H{
+			"Context":   c,
+			"VersionID": info.VersionID(c),
+		})
+	} else {
+		c.Redirect(http.StatusSeeOther, getLoginURL(c, state))
 	}
 }
 
@@ -624,10 +618,13 @@ func Logout(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/")
 }
 
-func getLoginURL(state string, conf *oauth2.Config) string {
+func getLoginURL(c *gin.Context, state string) string {
+	log.Debugf("Entering")
+	defer log.Debugf("Exiting")
+
 	// State can be some kind of random generated hash string.
 	// See relevant RFC: http://tools.ietf.org/html/rfc6749#section-10.12
-	return conf.AuthCodeURL(state)
+	return oauth2Config(c, scopes()...).AuthCodeURL(state)
 }
 
 func randToken() string {
@@ -709,75 +706,58 @@ func DevAuth(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/")
 }
 
-func Auth(conf *oauth2.Config) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		log.Debugf("Entering")
-		defer log.Debugf("Exiting")
-		// Handle the exchange code to initiate a transport.
-		session := sessions.Default(c)
-		retrievedState := session.Get("state")
-		if retrievedState != c.Query("state") {
-			c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("Invalid session state: %s", retrievedState))
-			return
-		}
+func Auth(c *gin.Context) {
+	log.Debugf("Entering")
+	defer log.Debugf("Exiting")
+	// Handle the exchange code to initiate a transport.
+	session := sessions.Default(c)
+	retrievedState := session.Get("state")
+	if retrievedState != c.Query("state") {
+		c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("Invalid session state: %s", retrievedState))
+		return
+	}
 
-		log.Debugf("retrievedState: %#v", retrievedState)
-		ac := appengine.NewContext(c.Request)
-		tok, err := conf.Exchange(ac, c.Query("code"))
-		if err != nil {
-			log.Errorf("tok error: %#v\n %s", err, err)
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
+	log.Debugf("retrievedState: %#v", retrievedState)
+	ac := appengine.NewContext(c.Request)
+	conf := oauth2Config(c, scopes()...)
+	tok, err := conf.Exchange(ac, c.Query("code"))
+	if err != nil {
+		log.Errorf("tok error: %#v", err)
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
 
-		log.Debugf("tok: %#v", tok)
+	log.Debugf("tok: %#v", tok)
 
-		client := conf.Client(ac, tok)
-		resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		log.Debugf("body: %s", body)
+	client := conf.Client(ac, tok)
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	log.Debugf("body: %s", body)
 
-		uinfo := user.Info{}
-		var b binding.BindingBody = binding.JSON
-		err = b.BindBody(body, &uinfo)
-		if err != nil {
-			log.Errorf("BindBody error: %v", err)
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		log.Debugf("info: %#v", uinfo)
+	uinfo := user.Info{}
+	var b binding.BindingBody = binding.JSON
+	err = b.BindBody(body, &uinfo)
+	if err != nil {
+		log.Errorf("BindBody error: %v", err)
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	log.Debugf("info: %#v", uinfo)
 
-		id := user.ID(uinfo.Sub)
-		u, err := user.ByID(c, id)
-		if err == datastore.ErrNoSuchEntity {
-			u = user.New2(id)
-			u.Email = uinfo.Email
-			err = u.To(session)
-			if err != nil {
-				log.Errorf("session.Save error: %v", err)
-				c.AbortWithError(http.StatusBadRequest, err)
-				return
-			}
-			log.Debugf("session saved")
-			c.Redirect(http.StatusSeeOther, userNewPath)
-			return
-		}
-
-		if err != nil {
-			log.Errorf("user.ByID => \n\t id: %s\n\t error: %s", id, err)
-			c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-
+	id := user.ID(uinfo.Sub)
+	u, err := user.ByID(c, id)
+	if err == datastore.ErrNoSuchEntity {
+		u = user.New2(id)
+		u.Email = uinfo.Email
 		err = u.To(session)
 		if err != nil {
 			log.Errorf("session.Save error: %v", err)
@@ -785,7 +765,45 @@ func Auth(conf *oauth2.Config) gin.HandlerFunc {
 			return
 		}
 		log.Debugf("session saved")
-
-		c.Redirect(http.StatusSeeOther, "/")
+		c.Redirect(http.StatusSeeOther, userNewPath)
+		return
 	}
+
+	if err != nil {
+		log.Errorf("user.ByID => \n\t id: %s\n\t error: %s", id, err)
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	err = u.To(session)
+	if err != nil {
+		log.Errorf("session.Save error: %v", err)
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	log.Debugf("session saved")
+
+	c.Redirect(http.StatusSeeOther, "/")
+}
+
+func scopes() []string {
+	return []string{"email", "profile", "openid"}
+}
+
+func oauth2Config(c *gin.Context, scopes ...string) *oauth2.Config {
+	log.Debugf("Entering")
+	defer log.Debugf("Exiting")
+
+	conf := &oauth2.Config{
+		ClientID:     "435340145701-t5o50sjq7hsbilopgreobhvrv30e1tj4.apps.googleusercontent.com",
+		ClientSecret: "Fe5f-Ht1V5_GohDEOS_TQOVc",
+		Endpoint:     google.Endpoint,
+		Scopes:       scopes,
+		RedirectURL:  "https://user.slothninja.com/auth",
+	}
+	if isDev() {
+		port := getPort()
+		conf.RedirectURL = fmt.Sprintf("http://user.slothninja.com:%s/auth", port)
+	}
+	return conf
 }

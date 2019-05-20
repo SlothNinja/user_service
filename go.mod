@@ -3,7 +3,7 @@ module bitbucket.org/SlothNinja/got
 require (
 	bitbucket.org/SlothNinja/log v0.0.0-20190402235934-21c011b9a8eb
 	bitbucket.org/SlothNinja/restful v0.0.0-20190401214758-b385392c0cbd
-	bitbucket.org/SlothNinja/user v0.0.1
+	bitbucket.org/SlothNinja/user v0.0.2
 	cloud.google.com/go v0.37.4
 	github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 // indirect
 	github.com/gin-contrib/sessions v0.0.0-20190226023029-1532893d996f

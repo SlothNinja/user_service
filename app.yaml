@@ -14,6 +14,32 @@
 
 runtime: go112
 
+env_variables:
+  DATASTORE_PROJECT_ID: "user-slothninja-games"
+
 handlers:
+- url: /img
+  static_dir: dist/img
+  secure: always
+
+- url: /js
+  static_dir: dist/js
+  secure: always
+
+- url: /css
+  static_dir: dist/css
+  secure: always
+
+- url: /
+  static_files: dist/index.html
+  upload: dist/index.html
+  secure: always
+
+- url: /(.*\.(gif|png|jpg|js|ico))$
+  static_files: dist/\1
+  upload: dist/.*\.(gif|png|jpg|js|ico)$
+  secure: always
+
 - url: /.*
   script: auto
+  secure: always

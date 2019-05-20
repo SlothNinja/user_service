@@ -1,7 +1,6 @@
 start backend
 ----------------------------
-
-DEV=true DEV_CLIENT_CREDENTIALS=dev_client_credentials.json gin -a 8080 -i -t ../ -d . run main.go
+DATASTORE_PROJECT_ID=user-slothninja-games DATASTORE_EMULATOR_HOST=user.slothninja.com:8081 DEV=true GOOGLE_APPLICATION_CREDENTIALS=dev_client_credentials.json gin -a 8080 -i -t ../ -d . run main.go
 
 
 start database

@@ -4,10 +4,8 @@ bitbucket.org/SlothNinja/log v0.0.0-20190402235934-21c011b9a8eb h1:hsE1KB+JGJL4O
 bitbucket.org/SlothNinja/log v0.0.0-20190402235934-21c011b9a8eb/go.mod h1:NrfFh+1hCuEgfS4B55UoDvw7q3/5yklamhz60E8Pg8c=
 bitbucket.org/SlothNinja/restful v0.0.0-20190401214758-b385392c0cbd h1:cmx6q8yhNe6aHgcaYyoskhA6afOtR7zkVa9mofN1CFc=
 bitbucket.org/SlothNinja/restful v0.0.0-20190401214758-b385392c0cbd/go.mod h1:hj3ciBtqXGazX8jWTiLt99MtU6UtdPVVuerj0VLQWMk=
-bitbucket.org/SlothNinja/user v0.0.0-20190402235632-7e4bfb535c77 h1:awzam9eKxRUQtUqWdeYHxkWZQzxSrktS+mDNC+/kpEQ=
-bitbucket.org/SlothNinja/user v0.0.0-20190402235632-7e4bfb535c77/go.mod h1:mLzOBBEFeDOeJ/MJTgaEOSBsY/LM8dpM55q1w0uOz3Y=
-bitbucket.org/SlothNinja/user v0.0.1 h1:EhUHzoFyAWumKb5qDpF7VYVOewZlEdN68/qp7qX+ROY=
-bitbucket.org/SlothNinja/user v0.0.1/go.mod h1:UUtz1aqhQ0TQsz0XvDAi+C0edwcElJSJouMkOPm5IlE=
+bitbucket.org/SlothNinja/user v0.0.2 h1:QLGtq3OrA5vtma5EFco/MwWFNJOOJwD1IoR6+ZlKjOo=
+bitbucket.org/SlothNinja/user v0.0.2/go.mod h1:UUtz1aqhQ0TQsz0XvDAi+C0edwcElJSJouMkOPm5IlE=
 bitbucket.org/pkg/inflect v0.0.0-20130829110746-8961c3750a47 h1:XDrztcXGcx7jow3UUE2dpYtdSWVUigoyn8G+shykEtw=
 bitbucket.org/pkg/inflect v0.0.0-20130829110746-8961c3750a47/go.mod h1:8Rt8gHhG+tKz8P3SoEzL/ZNVl25fPhMFKItv5HLIdtY=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -191,8 +189,6 @@ golang.org/x/net v0.0.0-20190213061140-3a22650c66bd/go.mod h1:mL1N/T3taQHkDXs73r
 golang.org/x/net v0.0.0-20190311183353-d8887717615a/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
 golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c h1:uOCk1iQW6Vc18bnC13MfzScl+wdKBmM9Y9kU7Z83/lw=
 golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
-golang.org/x/net v0.0.0-20190509222800-a4d6f7feada5 h1:6M3SDHlHHDCx2PcQw3S4KsR170vGqDhJDOmpVd4Hjak=
-golang.org/x/net v0.0.0-20190509222800-a4d6f7feada5/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/oauth2 v0.0.0-20181017192945-9dcd33a902f4/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
