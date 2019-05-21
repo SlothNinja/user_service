@@ -311,17 +311,19 @@ func create(prefix string) gin.HandlerFunc {
 			return
 		}
 
-		old, err := user.ByOldEntries(c, u.Name, u.Email)
+		id0, id1, gid, joinedAt, found, err := user.ByOldEntries(c, u.Email)
 		if err != nil {
 			log.Errorf("user.ByOldEntries error: %s", err)
 			jsonMsg(c, "Unexpected error. Try again.")
 			return
 		}
 
-		log.Debugf("old: %#v", old)
-		if old != nil {
-			u.User0ID = old.OldID
-			u.User1ID = old.Key.Name
+		log.Debugf("found: %#v", found)
+		if found {
+			u.User0ID = id0
+			u.User1ID = id1
+			u.GoogleID = gid
+			u.JoinedAt = joinedAt
 		}
 
 		client, err := user.Client(c)
@@ -332,7 +334,10 @@ func create(prefix string) gin.HandlerFunc {
 		}
 
 		t := time.Now()
-		u.JoinedAt, u.UpdatedAt, u.CreatedAt = t, t, t
+		u.UpdatedAt, u.CreatedAt = t, t
+		if u.JoinedAt.IsZero() {
+			u.JoinedAt = t
+		}
 		_, err = client.Put(c, u.Key, u)
 		if err != nil {
 			log.Errorf("datastore.Put error: %v", err)
@@ -348,12 +353,8 @@ func create(prefix string) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, struct {
-			CU  *user.User2 `json:"cu"`
-			Msg string      `json:"msg"`
-		}{
-			CU:  cu,
-			Msg: fmt.Sprintf("%s is now registered."),
-		})
+			U *user.User2 `json:"u"`
+		}{U: u})
 	}
 }
 

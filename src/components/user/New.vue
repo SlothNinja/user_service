@@ -173,9 +173,12 @@
         axios.put('/new', self.u)
           .then(function (response) {
             self.loading = false
-            var cu = _.get(response, 'data.cu', false)
-            if (cu) {
-              self.cu = response.data.cu
+            var u = _.get(response, 'data.u', false)
+            if (u) {
+              self.u = response.data.u
+              if (_.isNil(self.cu)) {
+                      self.cu = u
+              }
             }
             var msg = _.get(response, 'data.msg', false)
             if (msg) {
