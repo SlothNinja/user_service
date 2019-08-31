@@ -6,6 +6,14 @@ bitbucket.org/SlothNinja/restful v0.0.0-20190401214758-b385392c0cbd h1:cmx6q8yhN
 bitbucket.org/SlothNinja/restful v0.0.0-20190401214758-b385392c0cbd/go.mod h1:hj3ciBtqXGazX8jWTiLt99MtU6UtdPVVuerj0VLQWMk=
 bitbucket.org/SlothNinja/user v0.0.2 h1:QLGtq3OrA5vtma5EFco/MwWFNJOOJwD1IoR6+ZlKjOo=
 bitbucket.org/SlothNinja/user v0.0.2/go.mod h1:UUtz1aqhQ0TQsz0XvDAi+C0edwcElJSJouMkOPm5IlE=
+bitbucket.org/SlothNinja/user v0.0.4 h1:caRTPvIQPJAxlwtBjf79UmA4ta2b+6drtk9PAxGr3OU=
+bitbucket.org/SlothNinja/user v0.0.4/go.mod h1:wpsLAYSeZVXYBb5LrZ7wa6HmhsYTYao/d/fhxkqeBP4=
+bitbucket.org/SlothNinja/user v0.0.6 h1:VMFjpCll7NF5VXIUurqJxcOuEqf6IHh8BVC+9xnaJQY=
+bitbucket.org/SlothNinja/user v0.0.6/go.mod h1:wpsLAYSeZVXYBb5LrZ7wa6HmhsYTYao/d/fhxkqeBP4=
+bitbucket.org/SlothNinja/user v0.0.7 h1:dLorIcF4AIzglgoJoS9e7J/cGTQEoVP2l2I0SDlNncc=
+bitbucket.org/SlothNinja/user v0.0.7/go.mod h1:wpsLAYSeZVXYBb5LrZ7wa6HmhsYTYao/d/fhxkqeBP4=
+bitbucket.org/SlothNinja/user v0.0.8 h1:GC5cX3g8+JIJYcvcrNN1XMkxY8M3WLE8ZRmIBtw7oNg=
+bitbucket.org/SlothNinja/user v0.0.8/go.mod h1:wpsLAYSeZVXYBb5LrZ7wa6HmhsYTYao/d/fhxkqeBP4=
 bitbucket.org/pkg/inflect v0.0.0-20130829110746-8961c3750a47 h1:XDrztcXGcx7jow3UUE2dpYtdSWVUigoyn8G+shykEtw=
 bitbucket.org/pkg/inflect v0.0.0-20130829110746-8961c3750a47/go.mod h1:8Rt8gHhG+tKz8P3SoEzL/ZNVl25fPhMFKItv5HLIdtY=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=

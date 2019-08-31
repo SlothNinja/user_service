@@ -15,7 +15,9 @@
 runtime: go112
 
 env_variables:
-  DATASTORE_PROJECT_ID: "user-slothninja-games"
+  USER_DATASTORE_PROJECT_ID: "user-slothninja-games"
+  HOST: "https://user.slothninja.com"
+
 
 handlers:
 - url: /img

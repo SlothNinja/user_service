@@ -24,7 +24,7 @@
 <script>
   import UserButton from '@/components/user/Button'
   import Color from '@/components/mixins/Color'
-  import { mapGetters } from 'vuex'
+  // import { mapGetters } from 'vuex'
 
   export default {
     mixins: [ Color ],
@@ -34,9 +34,9 @@
       'sn-user-btn': UserButton
     },
     computed: {
-      ...mapGetters([
-        'pidByUID'
-      ]),
+      // ...mapGetters([
+      //   'pidByUID'
+      // ]),
       pid: function () {
         var self = this
         var pid = self.pidByUID(self.message.creatorID)

@@ -8,6 +8,14 @@
         set: function (value) {
           this.$root.cu = value
         }
+      },
+      cuLoading: {
+        get: function () {
+          return this.$root.cuLoading
+        },
+        set: function (value) {
+          this.$root.cuLoading = value
+        }
       }
     }
   }

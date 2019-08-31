@@ -1,10 +1,15 @@
 package main
 
 import (
+	"bitbucket.org/SlothNinja/user"
 	"github.com/gin-gonic/gin"
 )
 
-func addRoutes(prefix string, engine *gin.Engine) {
+const (
+	authPath = "/auth"
+)
+
+func addRoutes(host, port, prefix string, secure bool, engine *gin.Engine) {
 	// User Group
 	g1 := engine.Group(prefix)
 
@@ -15,7 +20,7 @@ func addRoutes(prefix string, engine *gin.Engine) {
 	g1.PUT("/new", create(prefix))
 
 	// Current User
-	g1.GET("/current", current(prefix))
+	g1.GET("/current", current)
 
 	// User
 	g1.GET("/json/:id", json(prefix))
@@ -23,13 +28,8 @@ func addRoutes(prefix string, engine *gin.Engine) {
 	// Update User
 	g1.PUT("edit/:uid", update(prefix))
 
-	g1.GET("/login", Login)
-
-	g1.GET("/logout", Logout)
+	g1.GET("/login", user.Login(authPath))
 
 	// authHandler
-	g1.GET("/auth", Auth)
-
-	// devauthHandler
-	g1.POST("/auth", DevAuth)
+	g1.GET("/auth", user.Auth(authPath))
 }

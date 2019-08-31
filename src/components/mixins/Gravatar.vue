@@ -11,9 +11,9 @@
           t = 'monsterid'
         }
         if (t == 'personal') {
-          return `http://www.gravatar.com/avatar/${hash}?s=${sz}`
+          return `https://www.gravatar.com/avatar/${hash}?s=${sz}`
         }
-        return `http://www.gravatar.com/avatar/${hash}?s=${sz}&d=${t}&f=y`
+        return `https://www.gravatar.com/avatar/${hash}?s=${sz}&d=${t}&f=y`
       },
       gravTypes: function () {
         return ['personal', 'identicon', 'monsterid', 'retro', 'robohash']

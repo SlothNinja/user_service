@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"bitbucket.org/SlothNinja/restful"
@@ -18,7 +18,9 @@ const (
 	DEV               = "DEV"
 	TRUE              = "true"
 	PORT              = "PORT"
-	DefaultPort       = "8080"
+	HOST              = "user.slothninja.com"
+	AUTHPATH          = "auth"
+	DefaultPort       = ":8080"
 	sessionName       = "sngsession"
 	sessionSecret     = "verySecretiveSecret1234!"
 	rootPath          = "/"
@@ -30,24 +32,33 @@ const (
 	week              = day * 7
 	envDevClientCreds = "DEV_CLIENT_CREDENTIALS"
 	envClientCreds    = "CLIENT_CREDENTIALS"
+	domain            = ".slothninja.com"
 )
 
 func main() {
 	setGinMode()
 	r := newRouter(newCookieStore())
 
-	addRoutes(rootPath, r)
-
 	port := getPort()
+	secure := true
+	if isDev() {
+		secure = false
+	}
+
+	addRoutes(HOST, port, rootPath, secure, r)
 
 	log.Printf("Listening on port %s", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), r))
+	log.Fatal(http.ListenAndServe(port, r))
 }
 
 func getPort() string {
 	port := os.Getenv(PORT)
 	if port != "" {
-		return port
+		if strings.HasPrefix(port, ":") {
+			return port
+		}
+		return ":" + port
+
 	}
 	port = DefaultPort
 	log.Printf("Defaulting to port %s", port)
@@ -62,6 +73,8 @@ func staticRoutes(r *gin.Engine) {
 		r.StaticFile("/app.js", "dist/app.js")
 		r.StaticFile("/favicon.ico", "dist/favicon.ico")
 		r.Static("/img", "dist/img")
+		r.Static("/js", "dist/js")
+		r.Static("/css", "dist/css")
 	}
 }
 
@@ -90,6 +103,7 @@ func setGinMode() {
 func newCookieStore() cookie.Store {
 	store := cookie.NewStore([]byte(sessionSecret))
 	store.Options(sessions.Options{
+		Domain: domain,
 		Path:   rootPath,
 		MaxAge: int(week.Truncate(time.Second)),
 	})

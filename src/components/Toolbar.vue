@@ -4,20 +4,25 @@
       <v-flex xs6>
         <v-layout row>
           <v-flex>
-            <div v-if="cu" class="font-weight-bold title">
-              <sn-user-btn size="small" :user="cu" ></sn-user-btn>
-              {{cu.name}}
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                  <v-btn @click="logout" icon color="green" v-on="on">
-                    <v-icon>exit_to_app</v-icon>
-                  </v-btn>
-                </template>
-                <span>Logout</span>
-              </v-tooltip>
+            <div style="height:4em" v-if="cuLoading">
+              &nbsp;
             </div>
-            <div v-else>
-              <v-btn href="/login" color="green">Login</v-btn>
+            <div style="height:4em" v-else>
+              <div v-if="cu" class="font-weight-bold title">
+                <sn-user-btn size="small" :user="cu" ></sn-user-btn>
+                {{cu.name}}
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn @click="logout" icon color="green" v-on="on">
+                      <v-icon>exit_to_app</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Logout</span>
+                </v-tooltip>
+              </div>
+              <div v-else>
+                <v-btn href="/login" color="green">Login</v-btn>
+              </div>
             </div>
           </v-flex>
         </v-layout>
@@ -61,10 +66,11 @@
         var self = this
         self.delete_cookie('sngsession')
         self.cu = null
+        self.cuLoading = false
         self.$router.push({ name: 'home'})
       },
       delete_cookie: function (name) {
-        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = name + '= ; domain = .slothninja.com ; expires = Thu, 01 Jan 1970 00:00:00 GMT'
       }
     }
   }

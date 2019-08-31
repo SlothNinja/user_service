@@ -85,7 +85,7 @@
   import NavDrawer from '@/components/NavDrawer'
   import RDrawer from '@/components/rdrawer/Drawer'
   import Board from '@/components/board/Board'
-  import Bar from '@/components/card/bar'
+  import Bar from '@/components/card/Bar'
   import StatusPanel from '@/components/game/StatusPanel'
   import Panels from '@/components/player/Panels'
   import Messagebar from '@/components/game/Messagebar'
@@ -447,7 +447,7 @@
       },
       currentCount: function () {
         var self = this
-        return _.get(self, 'game.header.undoStack.currentCount', 0)
+        return _.get(self, 'game.undoStack.currentCount', 0)
       },
       message: function () {
         var self = this

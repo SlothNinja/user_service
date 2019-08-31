@@ -80,12 +80,12 @@
       canUndo: function () {
         var self = this
         return (self.isCPorAdmin(self.value.header, self.value.state.players, self.cu) &&
-          (self.value.header.undoStack.currentCount > self.value.header.undoStack.commitCount))
+          (self.value.undoStack.currentCount > self.value.undoStack.commitCount))
       },
       canRedo: function () {
         var self = this
         return (self.isCPorAdmin(self.value.header, self.value.state.players, self.cu) &&
-          (self.value.header.undoStack.currentCount < self.value.header.undoStack.updateCount))
+          (self.value.undoStack.currentCount < self.value.undoStack.updateCount))
       },
       canReset: function () {
         var self = this
