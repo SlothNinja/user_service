@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/SlothNinja/log"
-	"bitbucket.org/SlothNinja/user"
+	"github.com/SlothNinja/user"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
@@ -24,8 +24,8 @@ func newAction(prefix string) gin.HandlerFunc {
 		log.Debugf("Entering")
 		defer log.Debugf("Exiting")
 
-		_, found := user.Current(c)
-		if !found {
+		cu := user.Current(c)
+		if cu != user.None {
 			jsonMsg(c, "You already have an account.")
 			return
 		}
@@ -53,8 +53,8 @@ func current(c *gin.Context) {
 	log.Debugf("Entering")
 	defer log.Debugf("Exiting")
 
-	cu, found := user.Current(c)
-	if !found {
+	cu := user.Current(c)
+	if cu == user.None {
 		jsonMsg(c, "unable to find current user")
 		return
 	}
@@ -83,8 +83,8 @@ func create(prefix string) gin.HandlerFunc {
 		log.Debugf("Entering")
 		defer log.Debugf("Exiting")
 
-		_, found := user.Current(c)
-		if !found {
+		cu := user.Current(c)
+		if cu == user.None {
 			jsonMsg(c, "must be logged-in to create account.")
 			return
 		}
@@ -194,8 +194,8 @@ func update(prefix string) gin.HandlerFunc {
 		log.Debugf("Entering")
 		defer log.Debugf("Exiting")
 
-		cu, found := user.Current(c)
-		if !found {
+		cu := user.Current(c)
+		if cu == user.None {
 			jsonMsg(c, "Must be logged-in to edit account.")
 			return
 		}
@@ -251,11 +251,7 @@ func update(prefix string) gin.HandlerFunc {
 }
 
 func jsonMsg(c *gin.Context, format string, args ...interface{}) {
-	c.JSON(http.StatusOK, struct {
-		Msg string `json:"msg"`
-	}{
-		Msg: fmt.Sprintf(format, args...),
-	})
+	c.JSON(http.StatusOK, gin.H{"msg": fmt.Sprintf(format, args...)})
 }
 
 func uniqueName(c *gin.Context, u1 user.User2) (bool, error) {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bitbucket.org/SlothNinja/user"
+	"github.com/SlothNinja/user"
 	"github.com/gin-gonic/gin"
 )
 
