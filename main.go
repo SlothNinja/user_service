@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"bitbucket.org/SlothNinja/restful"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -83,8 +82,6 @@ func newRouter(store cookie.Store) *gin.Engine {
 	r.Use(
 		gin.Logger(),
 		gin.Recovery(),
-		restful.CTXHandler(),
-		restful.TemplateHandler(r),
 		sessions.Sessions(sessionName, store),
 	)
 	staticRoutes(r)
