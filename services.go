@@ -1,18 +1,17 @@
 package main
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
+	"cloud.google.com/go/datastore"
 	"github.com/SlothNinja/log"
 	"github.com/SlothNinja/user"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-
-	"cloud.google.com/go/datastore"
+	"golang.org/x/exp/errors"
+	"golang.org/x/exp/errors/fmt"
 )
 
 const (
@@ -61,7 +60,7 @@ func newAction(prefix string) gin.HandlerFunc {
 		}
 
 		u := user.New(token.ID)
-		u.Name = user.Name(token.Email)
+		u.Name = user.NameFrom(token.Email)
 		u.Email = token.Email
 		u.EmailReminders = true
 		u.EmailNotifications = true
@@ -88,10 +87,17 @@ func json(prefix string) gin.HandlerFunc {
 		defer log.Debugf(exitMsg)
 
 		id := c.Param("id")
-		u, err := user.ByID(c, id)
+
+		client, err := user.Client(c)
 		if err != nil {
-			log.Warningf("ByID err: %s", err)
-			c.Redirect(http.StatusSeeOther, homePath)
+			jerr(c, fmt.Errorf("%s: %w", err, user.ErrClient))
+			return
+		}
+
+		u := user.New(id)
+		err = client.Get(c, u.Key, &u)
+		if err != nil {
+			jerr(c, err)
 			return
 		}
 
@@ -117,7 +123,14 @@ func create(prefix string) gin.HandlerFunc {
 			return
 		}
 
-		u, err := user.ByID(c, token.ID)
+		client, err := user.Client(c)
+		if err != nil {
+			jerr(c, fmt.Errorf("%s: %w", err, user.ErrClient))
+			return
+		}
+
+		u := user.New(token.ID)
+		err = client.Get(c, u.Key, &u)
 		if err == nil {
 			jerr(c, errHaveAccount)
 			return
@@ -129,12 +142,6 @@ func create(prefix string) gin.HandlerFunc {
 		}
 
 		u, err = fromJSON(c, token.ID, token.Email)
-		if err != nil {
-			jerr(c, err)
-			return
-		}
-
-		client, err := user.Client(c)
 		if err != nil {
 			jerr(c, err)
 			return
@@ -153,7 +160,7 @@ func create(prefix string) gin.HandlerFunc {
 
 		log.Debugf("put user: %#v", u)
 
-		err = u.To(session)
+		err = u.SaveTo(session)
 		if err != nil {
 			jerr(c, err)
 			return
@@ -209,7 +216,14 @@ func update(prefix string) gin.HandlerFunc {
 			return
 		}
 
-		u, err := user.ByID(c, uid)
+		client, err := user.Client(c)
+		if err != nil {
+			jerr(c, fmt.Errorf("%s: %w", err, user.ErrClient))
+			return
+		}
+
+		u := user.New(uid)
+		err = client.Get(c, u.Key, &u)
 		if err != nil {
 			jerr(c, err)
 			return
@@ -221,21 +235,17 @@ func update(prefix string) gin.HandlerFunc {
 			return
 		}
 
-		uniq, err := uniqueName(c, u2)
-		if err != nil {
-			jerr(c, err)
-			return
-		}
+		if u2.Name != u.Name {
+			uniq, err := uniqueName(c, u2)
+			if err != nil {
+				jerr(c, err)
+				return
+			}
 
-		if !uniq {
-			jerr(c, fmt.Errorf("screen name: %s already in use: %w", u2.Name, errValidation))
-			return
-		}
-
-		client, err := user.Client(c)
-		if err != nil {
-			jerr(c, err)
-			return
+			if !uniq {
+				jerr(c, fmt.Errorf("screen name: %s already in use: %w", u2.Name, errValidation))
+				return
+			}
 		}
 
 		_, err = client.Put(c, u2.Key, &u2)
@@ -249,13 +259,26 @@ func update(prefix string) gin.HandlerFunc {
 }
 
 func uniqueName(c *gin.Context, u1 user.User) (bool, error) {
-	u2, err := user.ByLCName(c, u1.LCName)
+	log.Debugf("Entering")
+	defer log.Debugf("Exiting")
+
+	client, err := user.Client(c)
 	if err != nil {
 		return false, err
 	}
 
-	if u1.LCName == u2.LCName && u1.ID() != u2.ID() {
+	var us []user.User
+	ks, err := client.GetAll(c, datastore.NewQuery(user.Kind).Filter("LCName =", u1.LCName), &us)
+	if err != nil {
+		return false, err
+	}
+
+	switch l := len(ks); l {
+	case 0:
+		return true, nil
+	case 1:
+		return u1.LCName == us[0].LCName && u1.ID() != us[0].ID(), nil
+	default:
 		return false, nil
 	}
-	return true, nil
 }
